@@ -1,0 +1,41 @@
+name: HA Config Git Backup
+version: "2.0.0"
+slug: ha_config_git_backup
+description: Periodically back up your Home Assistant configuration to a Git repository
+url: https://github.com/gongcy/hass-addons/tree/main/ha_config_git_backup
+arch:
+  - amd64
+  - aarch64
+init: false
+startup: application
+boot: auto
+homeassistant_api: true
+map:
+  - type: homeassistant_config
+    read_only: true
+    path: /homeassistant
+options:
+  repo_url: ""
+  branch: "main"
+  interval: 86400
+  username: "oauth2"
+  token: ""
+  host_key: ""
+  exclude: []
+  commit_author_name: "HA Config Backup"
+  commit_author_email: "ha-config-backup@local"
+  dry_run: false
+  notify_on_failure: true
+schema:
+  repo_url: str?
+  branch: str
+  interval: int(300,)
+  username: str?
+  token: password?
+  host_key: str?
+  exclude:
+    - str
+  commit_author_name: str
+  commit_author_email: str
+  dry_run: bool
+  notify_on_failure: bool

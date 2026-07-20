@@ -1,0 +1,44 @@
+configuration:
+  repo_url:
+    name: Repository URL
+    description: >-
+      Full URL of the target Git repository. Use ssh://git@host:port/path.git
+      for SSH or https://host/path.git for HTTPS. scp-style URLs
+      (git@host:path) are rejected because they cannot express a port.
+  branch:
+    name: Branch
+    description: Branch to push to. Each Home Assistant instance needs its own repository or branch.
+  interval:
+    name: Interval
+    description: Seconds between backup runs. Default is 86400 (once a day).
+  username:
+    name: HTTPS username
+    description: >-
+      Only used for HTTPS. The default works for GitHub, GitLab and Gitea.
+      Change it only if your host rejects it.
+  token:
+    name: HTTPS token
+    description: Personal access token with write access. Only used for HTTPS.
+  host_key:
+    name: SSH host key
+    description: >-
+      Optional. A full known_hosts line from `ssh-keyscan -p PORT HOST`.
+      When set, the host key is pinned. When empty, the key is learned on
+      first connection and any later change is rejected.
+  exclude:
+    name: Additional excludes
+    description: >-
+      Extra rsync exclude patterns, added on top of the built-in defaults.
+      The built-in list is always applied.
+  commit_author_name:
+    name: Commit author name
+    description: Author name used for backup commits.
+  commit_author_email:
+    name: Commit author email
+    description: Author email used for backup commits.
+  dry_run:
+    name: Dry run
+    description: List what would be committed without committing or pushing.
+  notify_on_failure:
+    name: Notify on failure
+    description: Create a persistent notification in Home Assistant when a backup run fails.

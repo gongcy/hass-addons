@@ -1,0 +1,37 @@
+# rsync 排除表。前导 / 表示锚定到同步根目录（即 HA 配置目录），
+# 不加前导 / 则匹配任意层级的同名条目。
+
+# 工作副本自身的 git 元数据。必须排除，否则 rsync --delete 会把它删掉，
+# 每轮都退化成全新仓库。
+/.git/
+
+# 主数据库及其 WAL/SHM 边车文件。体积大、每秒都在变、无版本化价值。
+/home-assistant_v2.db
+/home-assistant_v2.db-shm
+/home-assistant_v2.db-wal
+
+# 日志与崩溃转储。
+*.log
+*.log.*
+*.fault
+
+# Nabu Casa 云连接凭据。高度敏感，且恢复时通常仍需重新登录，备份价值低。
+/.cloud/
+
+# .storage 里的纯运行时状态。实测每几分钟就被 HA 重写一次
+# （core.restore_state 单个 294KB），入库会让"无变更跳过"几乎永不触发，
+# git log 被噪声淹没。二者只是实体最后已知值和蓝牙缓存，恢复价值近乎为零。
+# 注意：注册表类文件（core.device_registry / core.config_entries 等）不排除，
+# 灾难恢复时真正需要的就是它们。
+/.storage/core.restore_state
+/.storage/bluetooth.passive_update_processor
+
+# 可重建的缓存与依赖。
+/tts/
+/deps/
+/.cache/
+__pycache__/
+*.pyc
+
+# 运行时锁文件。
+/.ha_run.lock

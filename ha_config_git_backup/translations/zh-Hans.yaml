@@ -1,0 +1,39 @@
+configuration:
+  repo_url:
+    name: 仓库地址
+    description: >-
+      目标 Git 仓库的完整 URL。SSH 用 ssh://git@主机:端口/路径.git，
+      HTTPS 用 https://主机/路径.git。不支持 scp 短语法（git@主机:路径），
+      因为它无法表达端口。
+  branch:
+    name: 分支
+    description: 推送的目标分支。每台 Home Assistant 必须用各自的仓库或分支。
+  interval:
+    name: 间隔
+    description: 两次备份之间的秒数，默认 86400（每天一次）。
+  username:
+    name: HTTPS 用户名
+    description: 仅 HTTPS 使用。默认值对 GitHub、GitLab、Gitea 均可用，除非主机拒绝否则不必改。
+  token:
+    name: HTTPS 令牌
+    description: 具有写权限的个人访问令牌，仅 HTTPS 使用。
+  host_key:
+    name: SSH 主机密钥
+    description: >-
+      可选。填 `ssh-keyscan -p 端口 主机` 输出的完整 known_hosts 行。
+      填了则严格钉住该指纹；留空则首次连接时记录，之后指纹变更即拒绝连接。
+  exclude:
+    name: 追加排除规则
+    description: 额外的 rsync 排除规则，追加在内置默认值之上。内置默认值始终生效。
+  commit_author_name:
+    name: 提交者名称
+    description: 备份提交所用的作者名。
+  commit_author_email:
+    name: 提交者邮箱
+    description: 备份提交所用的作者邮箱。
+  dry_run:
+    name: 演练模式
+    description: 只列出将要提交的内容，不实际提交和推送。
+  notify_on_failure:
+    name: 失败时通知
+    description: 备份失败时在 Home Assistant 中创建持久化通知。
