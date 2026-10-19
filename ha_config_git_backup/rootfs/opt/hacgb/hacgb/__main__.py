@@ -36,11 +36,24 @@ SUPERVISOR_URL = os.environ.get("HACGB_SUPERVISOR_URL", "http://supervisor")
 _IDLE_SECONDS = 3600
 
 
+def _apply_timezone() -> None:
+    """让本进程及其 git 子进程使用 HA 的时区。
+
+    Supervisor 会给 add-on 注入 TZ（取自 HA 的时区设置），但和 SUPERVISOR_TOKEN
+    一样只放在 s6 目录里，进程环境里没有，于是日志、提交信息和 git 提交时间
+    全都退回 UTC。读出来写回进程环境再 tzset，子进程会自动继承。
+    """
+    tz_name = read_container_env("TZ")
+    if tz_name:
+        os.environ["TZ"] = tz_name
+        time.tzset()
+
+
 def _configure_logging() -> None:
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s %(levelname)-5s %(message)s",
-        datefmt="%Y-%m-%dT%H:%M:%SZ",
+        datefmt="%Y-%m-%dT%H:%M:%S%z",
         stream=sys.stdout,
     )
 
@@ -51,6 +64,7 @@ def _idle_forever() -> int:
 
 
 def main() -> int:
+    _apply_timezone()
     _configure_logging()
     # 供测试与手工验证驱动单轮执行；正常运行时不设此变量。
     run_once = os.environ.get("HACGB_RUN_ONCE") == "true"
@@ -62,7 +76,9 @@ def main() -> int:
         enabled=config.notify_on_failure,
     )
 
-    _LOGGER.info("HA Config Git Backup starting")
+    _LOGGER.info(
+        "HA Config Git Backup starting (time zone %s)", os.environ.get("TZ", "UTC")
+    )
 
     # 先校验 URL：配错了就没必要生成密钥、建工作副本。
     try:

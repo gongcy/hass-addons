@@ -60,6 +60,13 @@ Add your own patterns through the `exclude` option. They are appended to the
 built-in list, which always applies. The working copy's own `.git/` directory
 is always excluded and cannot be overridden.
 
+Excluding a file that is already in the repository removes it on the next run
+(the deletion is committed). Its earlier versions stay in the git history, so
+rewrite the history yourself if the file held secrets.
+
+Timestamps in logs, commit messages and git commit dates use Home Assistant's
+time zone.
+
 ## Expect a commit almost every run
 
 The registries under `.storage` are rewritten frequently by Home Assistant,

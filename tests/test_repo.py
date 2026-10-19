@@ -1,5 +1,6 @@
 import shutil
 import subprocess
+import time
 from pathlib import Path
 
 import pytest
@@ -100,6 +101,23 @@ def test_commit_message_has_expected_prefix(repo, remote_repo, repo_dir):
     (repo_dir / "new.yaml").write_text("x")
     repo.commit("Test Bot", "bot@example.com")
     assert _git(repo_dir, "log", "-1", "--format=%s").startswith("Auto backup: ")
+
+
+def test_commit_time_follows_process_time_zone(
+    repo, remote_repo, repo_dir, monkeypatch
+):
+    """提交信息和 git 提交时间都要用 HA 的时区，而不是 UTC。"""
+    monkeypatch.setenv("TZ", "Asia/Shanghai")
+    time.tzset()
+    try:
+        repo.init(str(remote_repo), "main")
+        (repo_dir / "new.yaml").write_text("x")
+        repo.commit("Test Bot", "bot@example.com")
+        assert _git(repo_dir, "log", "-1", "--format=%s").endswith("+08:00")
+        assert _git(repo_dir, "log", "-1", "--format=%ai").endswith("+0800")
+    finally:
+        monkeypatch.undo()
+        time.tzset()
 
 
 def test_push_lands_on_remote(repo, remote_repo, repo_dir):

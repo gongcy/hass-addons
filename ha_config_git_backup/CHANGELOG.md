@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.1.0
+
+### Changed
+
+- Files that match an exclude pattern are now removed from the repository on
+  the next run. Previously they stayed in the working copy with their last
+  content, so adding a pattern for a file that was already backed up only
+  froze it.
+- Logs, commit messages and git commit dates use Home Assistant's time zone
+  instead of UTC.
+
 ## 2.0.0
 
 First public release.

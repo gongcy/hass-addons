@@ -5,7 +5,8 @@ FROM ${BUILD_FROM}
 RUN apk add --no-cache \
       git \
       openssh-client \
-      rsync
+      rsync \
+      tzdata
 
 COPY rootfs /
 

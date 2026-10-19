@@ -1,5 +1,5 @@
 name: HA Config Git Backup
-version: "2.0.0"
+version: "2.1.0"
 slug: ha_config_git_backup
 description: Periodically back up your Home Assistant configuration to a Git repository
 url: https://github.com/gongcy/hass-addons/tree/main/ha_config_git_backup

@@ -101,6 +101,33 @@ def test_git_metadata_survives_sync(populated_config, repo_dir, exclude_file):
     assert (repo_dir / ".git/HEAD").read_text() == "ref: refs/heads/main"
 
 
+def test_git_metadata_survives_when_dest_has_excluded_files(
+    populated_config, repo_dir, exclude_file
+):
+    """--delete-excluded 会清理接收端的排除项，.git 必须靠 protect 规则保住。"""
+    (repo_dir / ".git").mkdir(parents=True)
+    (repo_dir / ".git/HEAD").write_text("ref: refs/heads/main")
+    (repo_dir / "home-assistant.log").write_text("stale log")
+    sync_config(populated_config, repo_dir, exclude_file)
+    assert (repo_dir / ".git/HEAD").read_text() == "ref: refs/heads/main"
+    assert not (repo_dir / "home-assistant.log").exists()
+
+
+def test_newly_excluded_files_are_removed_from_working_copy(
+    populated_config, repo_dir, tmp_path: Path
+):
+    """先入库、后加进排除表的文件要从工作副本删掉，而不是以旧内容冻结。"""
+    rules = tmp_path / "rules"
+    rules.write_text("/.git/\n")
+    sync_config(populated_config, repo_dir, rules)
+    assert (repo_dir / "secrets.yaml").exists()
+
+    rules.write_text("/.git/\n/secrets.yaml\n")
+    sync_config(populated_config, repo_dir, rules)
+    assert not (repo_dir / "secrets.yaml").exists()
+    assert (populated_config / "secrets.yaml").exists()
+
+
 def test_missing_source_raises(tmp_path: Path, repo_dir, exclude_file):
     with pytest.raises(SyncError):
         sync_config(tmp_path / "nope", repo_dir, exclude_file)

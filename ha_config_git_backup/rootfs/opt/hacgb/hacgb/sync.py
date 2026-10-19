@@ -29,11 +29,17 @@ def sync_config(source: Path, dest: Path, exclude_file: Path) -> None:
     dest.mkdir(parents=True, exist_ok=True)
 
     # 结尾的斜杠有意义：源端加斜杠表示"同步目录内容"而非"同步目录本身"。
+    # --delete-excluded：之前已入库、后来才被排除的文件也要从工作副本删掉，
+    # 否则它们会以旧内容永久留在仓库里（排除规则只能让它们"冻结"）。
+    # 它会让排除规则不再保护接收端，所以 .git 必须另用 P（protect）规则保住，
+    # 且要排在排除表前面——rsync 按顺序取第一条匹配的规则。
     result = subprocess.run(
         [
             "rsync",
             "-a",
             "--delete",
+            "--delete-excluded",
+            "--filter=P /.git/",
             f"--exclude-from={exclude_file}",
             f"{source}/",
             f"{dest}/",

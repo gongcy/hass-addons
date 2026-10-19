@@ -10,7 +10,7 @@ import logging
 import os
 import subprocess
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from typing import Mapping, Sequence
 
@@ -122,7 +122,9 @@ class Repo:
         return self._run("status", "--short").stdout
 
     def commit(self, author_name: str, author_email: str) -> None:
-        stamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+        # 用进程本地时区（入口已按 HA 的时区设好 TZ），带上 UTC 偏移，
+        # 和 git 自己记录的提交时间对得上。
+        stamp = datetime.now().astimezone().isoformat(timespec="seconds")
         self._run("add", "-A")
         result = self._run(
             "-c", f"user.name={author_name}",
